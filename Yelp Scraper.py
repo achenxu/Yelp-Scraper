@@ -36,7 +36,7 @@ def making_soup(url):
     global soup
     soup = BeautifulSoup(page.content, 'html.parser')
 
-# Script start
+# Finding companies
 while finding_data == True:
     finding_data = False
     making_soup('https://www.yelp.com/search?find_desc=Chiropractors&find_loc=415&start='+str(page))
@@ -50,8 +50,9 @@ while finding_data == True:
 else:
     print('No more results available')
 
-print ('Companies found: '+ str(companies_list))
+print ('Companies found: '+ str(len(companies_list)))
 
+# End of script
 output_file.close ()
 print ('\nAll done!')
 end = time.time ()
