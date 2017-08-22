@@ -1,9 +1,9 @@
 '''This is my Yelp.com Scraper'''
 
-# Libraries needed
+# Libraries needed -imports
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+import pandas
 import xlsxwriter
 import re
 import time
@@ -28,7 +28,6 @@ finding_data = True
 
 # List of copanies gathered
 companies_list=[]
-total_companies=0
 
 # FUNC Getting page and making it Soup object
 def making_soup(url):
@@ -37,20 +36,41 @@ def making_soup(url):
     soup = BeautifulSoup(page.content, 'html.parser')
 
 # Finding companies
-while finding_data == True:
-    finding_data = False
-    making_soup('https://www.yelp.com/search?find_desc=Chiropractors&find_loc=415&start='+str(page))
-    print('Going to ''https://www.yelp.com/search?find_desc=Chiropractors&find_loc=415&start='+str(page))
-    page += 10
-    for company_pages in soup.find_all('h3', class_="search-result-title"):
-        for titles in company_pages(href=re.compile('/biz/')):
-            companies_list.append('https://www.yelp.com'+str(titles['href']))
-            finding_data = True
+def companies_search():
+    global finding_data
+    global page
 
-else:
-    print('No more results available')
+    while finding_data == True and page <=10:
+        finding_data = False
+        making_soup('https://www.yelp.com/search?find_desc=Chiropractors&find_loc=415&start='+str(page))
+        print('Going to ''https://www.yelp.com/search?find_desc=Chiropractors&find_loc=415&start='+str(page))
+        page += 10
+        for company_pages in soup.find_all('h3', class_="search-result-title"):
+            for titles in company_pages(href=re.compile('/biz/')):
+                companies_list.append('https://www.yelp.com'+str(titles['href']))
+                finding_data = True
+    else:
+        print('No more results available')
 
-print ('Companies found: '+ str(len(companies_list)))
+def getting_details():
+    for page in companies_list:
+        making_soup(page)
+        global col
+        # Getting company name
+        try:
+            title = soup.find(property="og:title")
+            worksheet.write(row, col, str(title))
+            col += 1
+        except:
+            print ('This item is not available')
+            worksheet.write(row, col, 'Not available')
+            col += 1
+
+
+# Script start
+companies_search()
+getting_details()
+print('Companies found: '+ str(len(companies_list)))
 
 # End of script
 output_file.close ()
