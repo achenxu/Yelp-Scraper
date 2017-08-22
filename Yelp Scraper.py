@@ -3,7 +3,7 @@
 # Libraries needed -imports
 import requests
 from bs4 import BeautifulSoup
-import pandas
+import json
 import xlsxwriter
 import re
 import time
@@ -56,15 +56,20 @@ def getting_details():
     for page in companies_list:
         making_soup(page)
         global col
-        # Getting company name
-        try:
-            title = soup.find(property="og:title")
-            worksheet.write(row, col, str(title))
-            col += 1
-        except:
-            print ('This item is not available')
-            worksheet.write(row, col, 'Not available')
-            col += 1
+        info = soup.find(type="application/ld+json")
+        # getting all attributes of the page
+        for items in info.children:
+            attr = json.loads(items)
+            try:
+                title=attr['name']
+                print(title)
+                worksheet.write (row, col, title)
+                col += 1
+            except:
+                print ('This item is not available')
+                worksheet.write (row, col, 'Not available')
+                col += 1
+
 
 
 # Script start
