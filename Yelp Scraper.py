@@ -70,7 +70,7 @@ def companies_search():
     global finding_data
     global page
 
-    while finding_data == True and page<=10:
+    while finding_data == True:
         finding_data = False
         making_soup('https://www.yelp.com/search?find_desc=' + str(search_term.replace(" ", "+")) + '&find_loc=' + str(location.replace(" ", "+"))+'&start='+str(page))
         page += 10
