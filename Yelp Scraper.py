@@ -1,5 +1,3 @@
-'''This is my Yelp.com Scraper'''
-
 # Libraries needed -imports
 import requests
 from bs4 import BeautifulSoup
@@ -13,8 +11,8 @@ print ('Libraries imported')
 start = time.time()
 
 # Output file
-output_file = xlsxwriter.Workbook ('Yelp_Results.xlsx')
-worksheet = output_file.add_worksheet ()
+output_file = xlsxwriter.Workbook('Yelp_Results.xlsx')
+worksheet = output_file.add_worksheet()
 
 # Variables needed
 # Needed for excel
@@ -56,19 +54,91 @@ def getting_details():
     for page in companies_list:
         making_soup(page)
         global col
+        global row
         info = soup.find(type="application/ld+json")
-        # getting all attributes of the page
+
+        # Getting all attributes of the page
         for items in info.children:
             attr = json.loads(items)
+
+            # Title
             try:
-                title=attr['name']
+                col = 0
+                title = attr['name']
                 print(title)
                 worksheet.write (row, col, title)
-                col += 1
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+            # Address
+            try:
+                col = 1
+                address = attr['address']['streetAddress']+", "+attr['address']['addressLocality']+", "+attr['address']['addressRegion']+", "+attr['address']['postalCode']+", "+attr['address']['addressCountry']
+                print(address)
+                worksheet.write(row, col, str(address))
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+            # Phone
+            try:
+                col = 2
+                phone = attr['telephone']
+                print(phone)
+                worksheet.write(row, col, phone)
+
             except:
                 print ('This item is not available')
-                worksheet.write (row, col, 'Not available')
-                col += 1
+                worksheet.write(row, col, 'Not available')
+
+            # Type
+            try:
+                col = 3
+                type = attr['@type']
+                print(type)
+                worksheet.write(row, col, type)
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+            # Review count
+            try:
+                col = 4
+                review_count = attr['aggregateRating']['reviewCount']
+                print(review_count)
+                worksheet.write (row, col, review_count)
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+            # Rating value
+            try:
+                col = 5
+                rating_value = attr['aggregateRating']['ratingValue']
+                print(rating_value)
+                worksheet.write(row, col, rating_value)
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+            # Description
+            try:
+                col = 6
+                description = soup.find(property="og:description")['content']
+                print(description)
+                worksheet.write(row, col, description)
+
+            except:
+                print('This item is not available')
+                worksheet.write(row, col, 'Not available')
+
+        row += 1
 
 
 
